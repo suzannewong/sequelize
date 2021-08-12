@@ -1,29 +1,38 @@
 const express = require("express");
 const morgan = require("morgan");
 const path = require("path");
-const fs = require('fs')
-const layout = require('./views/layout')
-const { db } = require('./models')
+const fs = require("fs");
+const layout = require("./views/layout");
+const { db, Page, User } = require("./models");
 
 const app = express();
 
 app.use(morgan("dev"));
 //Extended False = cannot post nested object
-app.use(express.urlencoded({extended:false}));
+app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
 
-
-db.authenticate()
-  .then(() => {
-    console.log('connected to the database');
-  })
+db.authenticate().then(() => {
+	console.log("connected to the database");
+});
 //Default Route
 app.get("/", (req, res) => {
-  res.send(layout(''));
-})
+	res.send(layout(""));
+});
 
-const PORT = 1337;
-app.listen(PORT, () => {
-  console.log(`App listening in ${PORT}`)
-})
+//The .sync methods being called off of Page and User can be placed pretty much anywhere, but we suggest an appropriate place might be before your server is calling its .listen method with a port.
+const init = async () => {
+	const PORT = 1337;
+	/*  //this would synchronize the individual models instead of the entire database 
+	await Page.sync();
+	await User.sync(); */
 
+	//if true, will drop all the tables
+	await db.sync({ force: true });
+	// make sure that you have a PORT constant
+	app.listen(PORT, () => {
+		console.log(`Server is listening on port ${PORT}!`);
+	});
+};
+
+init();
