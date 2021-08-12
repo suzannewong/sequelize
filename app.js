@@ -3,7 +3,7 @@ const morgan = require("morgan");
 const path = require("path");
 const fs = require("fs");
 const layout = require("./views/layout");
-const { db, Page, User } = require("./models");
+const { db, Page, User } = require("./models/models");
 const wiki = require("./routes/wiki");
 const users = require("./routes/users");
 
@@ -22,7 +22,7 @@ db.authenticate().then(() => {
 
 //Default Route
 app.get("/", (req, res) => {
-	res.send(layout(""));
+	res.redirect("/wiki");
 });
 
 //The .sync methods being called off of Page and User can be placed pretty much anywhere, but we suggest an appropriate place might be before your server is calling its .listen method with a port.
